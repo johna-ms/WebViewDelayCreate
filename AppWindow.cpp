@@ -34,10 +34,6 @@ AppWindow::AppWindow(bool createWebView)
 		g_nCmdShow);
 	UpdateWindow(m_window);
 
-	// this is arbitrary
-	m_toggleUrl = false;
-	m_doSleep = false;
-
 	// This is to identify the window from a static context - the static WndProc
 	SetWindowLongPtr(m_window, GWLP_USERDATA, (LONG_PTR)this);
 
@@ -77,23 +73,11 @@ void AppWindow::CreateWebView()
 			}).Get());
 }
 
-void AppWindow::Navigate(std::wstring url)
-{
-	if (m_webview)
-		m_webview->Navigate(url.c_str());
-}
-
-void AppWindow::NavigateRandom()
-{
-	m_toggleUrl = !m_toggleUrl;
-	std::wstring url = m_toggleUrl ? L"https://google.com" : L"https://startpage.com";
-	Navigate(url.c_str());
-}
 
 // The message handler does 2 things
 // 1. Necessary webview resize handling
 // 2. Processing keyboard accelerator events like Ctrl+N for new window
-bool AppWindow::HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* result)
+bool AppWindow::HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -116,31 +100,10 @@ bool AppWindow::HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPAR
 				case 'N':
 				{
 					// Make a new window. If shift is down, make a new window with no webview
-					if (m_doSleep)
-						Sleep(5000);
+					Sleep(5000);
 					new AppWindow(GetKeyState(VK_SHIFT) >= 0);
 					break;
 				};
-				case 'M':
-				{
-					// Navigate the current window to startpage.com or google.com randomly.
-					if (m_doSleep)
-						Sleep(5000);
-					NavigateRandom();
-					break;
-				};
-				case 'D':
-				{
-					// Create a webview in the current window.
-					if (m_doSleep)
-						Sleep(5000);
-					CreateWebView();
-				}
-				case'E':
-				{
-					// Set whether or not to wait for 5 seconds.
-					m_doSleep = !m_doSleep;
-				}
 				}
 			}
 		}
@@ -157,11 +120,34 @@ LRESULT CALLBACK AppWindow::WndProcStatic(HWND hWnd, UINT message, WPARAM wParam
 {
 	if (auto app = (AppWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA))
 	{
-		LRESULT result = 0;
-		if (app->HandleWindowMessage(hWnd, message, wParam, lParam, &result))
+		if (app->HandleWindowMessage(hWnd, message, wParam, lParam))
 		{
-			return result;
+			return 0;
 		}
+	}
+
+	switch (message)
+	{
+	case WM_KEYDOWN:
+		// If bit 30 is set, it means the WM_KEYDOWN message is autorepeated.
+		// We want to ignore it in that case.
+		if (!(lParam & (1 << 30)))
+		{
+			if (GetKeyState(VK_CONTROL) < 0)
+			{
+				switch (UINT(wParam))
+				{
+				case 'N':
+				{
+					// Make a new window. If shift is down, make a new window with no webview
+					Sleep(5000);
+					new AppWindow(GetKeyState(VK_SHIFT) >= 0);
+					break;
+				};
+				}
+			}
+		}
+		break;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }

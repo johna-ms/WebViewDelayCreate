@@ -16,17 +16,11 @@ class AppWindow
 	wil::com_ptr<ICoreWebView2> m_webview;
 
 	HWND m_window;
-	bool m_toggleUrl : 1;
-	bool m_doSleep : 1;
-
-	LRESULT CALLBACK HandleWindowMessage(HWND, UINT, WPARAM, LPARAM);
 
 public:
 	static LRESULT CALLBACK WndProcStatic(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	AppWindow(bool createWebView = true);
-	bool HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* result);
-	void NavigateRandom();
-	void Navigate(std::wstring url);
+	bool HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	void CreateWebView();
 };
