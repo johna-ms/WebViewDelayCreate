@@ -125,29 +125,5 @@ LRESULT CALLBACK AppWindow::WndProcStatic(HWND hWnd, UINT message, WPARAM wParam
 			return 0;
 		}
 	}
-
-	switch (message)
-	{
-	case WM_KEYDOWN:
-		// If bit 30 is set, it means the WM_KEYDOWN message is autorepeated.
-		// We want to ignore it in that case.
-		if (!(lParam & (1 << 30)))
-		{
-			if (GetKeyState(VK_CONTROL) < 0)
-			{
-				switch (UINT(wParam))
-				{
-				case 'N':
-				{
-					// Make a new window. If shift is down, make a new window with no webview
-					Sleep(5000);
-					new AppWindow(GetKeyState(VK_SHIFT) >= 0);
-					break;
-				};
-				}
-			}
-		}
-		break;
-	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
