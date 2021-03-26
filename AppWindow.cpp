@@ -5,6 +5,7 @@ extern TCHAR szWindowClass[];
 extern TCHAR szTitle[];
 extern HINSTANCE hInst;
 extern int g_nCmdShow;
+static int g_numAppWindows = 0;
 
 AppWindow::AppWindow(bool createWebView)
 {
@@ -41,6 +42,8 @@ AppWindow::AppWindow(bool createWebView)
 	{
 		CreateWebView();
 	}
+
+	++g_numAppWindows;
 }
 
 void AppWindow::CreateWebView()
@@ -109,7 +112,8 @@ bool AppWindow::HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		}
 		return true;;
 	case WM_DESTROY:
-		PostQuitMessage(0);
+		if (--g_numAppWindows == 0)
+			PostQuitMessage(0);
 		return true;
 	}
 
