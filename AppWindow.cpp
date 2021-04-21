@@ -118,7 +118,7 @@ bool AppWindow::HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPAR
 				case 'N':
 				{
 					// Make a new window. If shift is down, make a new window with no webview
-					Sleep(5000);
+					//Sleep(5000);
 					new AppWindow(GetKeyState(VK_SHIFT) >= 0);
 					break;
 				};
