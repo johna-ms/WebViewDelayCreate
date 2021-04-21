@@ -14,7 +14,7 @@ AppWindow::AppWindow(bool createWebView)
 		szTitle,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		1200, 900,
+		500, 500,
 		NULL,
 		NULL,
 		hInst,
@@ -40,7 +40,22 @@ AppWindow::AppWindow(bool createWebView)
 
 	if (createWebView)
 	{
-		CreateWebView();
+		Sleep(5000);
+		HWND hwndButton = CreateWindow(
+			L"BUTTON",  // Predefined class; Unicode assumed 
+			L"OK",      // Button text 
+			WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+			10,         // x position 
+			10,         // y position 
+			100,        // Button width
+			100,        // Button height
+			m_window,     // Parent window
+			NULL,       // No menu.
+			(HINSTANCE)GetWindowLongPtr(m_window, GWLP_HINSTANCE),
+			NULL);      // Pointer not needed.
+		ShowWindow(hwndButton, SW_SHOWNORMAL);
+		SetForegroundWindow(hwndButton);
+		UpdateWindow(hwndButton);
 	}
 
 	++g_numAppWindows;
